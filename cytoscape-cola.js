@@ -291,20 +291,27 @@ ColaLayout.prototype.run = function () {
         return ret;
       };
 
-      if (options.animate) {
-        var frame = function frame() {
-          if (multitick()) {
-            return;
-          }
+      // if not animated, run in a timeout so the
+      // options.maxSimulationTime timeout has a chance to interrupt
+      var frame = function frame() {
+        if (multitick()) {
+          return;
+        }
 
+        if (options.animate) {
           raf(frame);
-        };
-
+        } else {
+          setTimeout(function () {
+            return frame();
+          });
+        }
+      };
+      if (options.animate) {
         raf(frame);
       } else {
-        while (!inftick()) {
-          // keep going...
-        }
+        setTimeout(function () {
+          return frame();
+        });
       }
     },
 
@@ -573,10 +580,6 @@ ColaLayout.prototype.run = function () {
 
   layout.trigger({ type: 'layoutstart', layout: layout });
 
-  adaptor.avoidOverlaps(options.avoidOverlap).handleDisconnected(options.handleDisconnected).start(options.unconstrIter, options.userConstIter, options.allConstIter, undefined, // gridSnapIterations = 0
-  undefined, // keepRunning = true
-  options.centerGraph);
-
   if (!options.infinite) {
     setTimeout(function () {
       if (!layout.manuallyStopped) {
@@ -584,6 +587,10 @@ ColaLayout.prototype.run = function () {
       }
     }, options.maxSimulationTime);
   }
+
+  adaptor.avoidOverlaps(options.avoidOverlap).handleDisconnected(options.handleDisconnected).start(options.unconstrIter, options.userConstIter, options.allConstIter, undefined, // gridSnapIterations = 0
+  undefined, // keepRunning = true
+  options.centerGraph);
 
   return this; // chaining
 };
