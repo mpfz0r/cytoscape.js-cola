@@ -461,6 +461,14 @@ ColaLayout.prototype.run = function(){
 
   layout.trigger({ type: 'layoutstart', layout: layout });
 
+  if( !options.infinite ){
+    setTimeout(function(){
+      if( !layout.manuallyStopped ){
+        adaptor.stop();
+      }
+    }, options.maxSimulationTime);
+  }
+
   adaptor
     .avoidOverlaps( options.avoidOverlap )
     .handleDisconnected( options.handleDisconnected )
@@ -473,14 +481,6 @@ ColaLayout.prototype.run = function(){
       options.centerGraph
     )
   ;
-
-  if( !options.infinite ){
-    setTimeout(function(){
-      if( !layout.manuallyStopped ){
-        adaptor.stop();
-      }
-    }, options.maxSimulationTime);
-  }
 
   return this; // chaining
 };
