@@ -180,19 +180,25 @@ ColaLayout.prototype.run = function(){
         return ret;
       };
 
-      if( options.animate ){
-        let frame = function(){
-          if( multitick() ){ return; }
+      // if not animated, run in a timeout so the
+      // options.maxSimulationTime timeout has a chance to interrupt
+      let frame = function(){
+        if( multitick() ){ return; }
 
+        if (options.animate) {
           raf( frame );
-        };
-
-        raf( frame );
-      } else {
-        while( !inftick() ){
-          // keep going...
         }
+        else {
+          setTimeout(() => frame())
+        }
+      };
+      if (options.animate) {
+        raf( frame );
       }
+      else {
+        setTimeout(() => frame())
+      }
+
     },
 
     on: nop, // dummy; not needed
